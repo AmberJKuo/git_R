@@ -12,23 +12,28 @@ access_token_secret <- "137YdPfO9xmhjPDZyjIvYKtA5DgOkf1z6LhPQxQD1jy8H"
 setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
 
 #UAtweets <-c(searchTwitter('@unitedairlines',n=2000,since='2016-03-24'),searchTwitter('@united',n=2000,since='2016-03-24'),searchTwitter('united airlines',n=2000,since='2016-03-24'))
-UAtweets <-c(searchTwitter('@unitedairlines',n=10,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=10,since=as.character(Sys.Date() - 1)))
+UAtweets <-c(searchTwitter('@unitedairlines',n=1000,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=2000,since=as.character(Sys.Date() - 1)))
 
 #UAtweets.cln = laply(UAtweets, function(t) t$getText() )   #one-dimensional array = vector
 
 #remove duplicate tweets
 UAtweets.txt <- sapply( unlist( UAtweets ) , function(x) `$`( x , "text" ) )
 length(UAtweets.txt)
+#typeof(UAtweets.txt)
+#is.vector(UAtweets.txt)
+
 UAtweets.cln <- UAtweets.txt[!duplicated( UAtweets.txt )]   #this does the same: UAtweets.cln <- unique(UAtweets.txt)
 length(UAtweets.cln)
+
+#UAtweets.cln=str_replace_all(UAtweets.cln,"(^[:graph:])", "x")   #remove non graphical characters in vector with regex. THIS DOESN'T WORK CORRECTLY...don't know why
 
 hu.liu.pos = scan('C:/Users/u298739/Downloads/positive-words.txt',
                   what='character', comment.char=';')
 hu.liu.neg = scan('C:/Users/u298739/Downloads/negative-words.txt',
                   what='character', comment.char=';')
 
-pos.words = c(hu.liu.pos, 'stroopwafel')
-neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'UnitedFail', 'late', 'stuck')
+pos.words = c(hu.liu.pos, 'stroopwafel', 'waffle')
+neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'UnitedFail', 'late', 'stuck', 'unitedisadump', 'unitedidiots', 'custservfail', 'overbook', 'oversell')
 
 
   
@@ -41,7 +46,7 @@ neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'Un
     # or a vector as an "l" for us
     # we want a simple array of scores back, so we use
     # "l" + "a" + "ply" = "laply":
-    scores = laply(sentences, function(sentence, pos.words, neg.words) {
+    scores = laply(sentences, function(sentence,pos.words, neg.words) {
       
       # clean up sentences with R's regex-driven global substitute, gsub():
       sentence = gsub('[[:punct:]]', '', sentence)
