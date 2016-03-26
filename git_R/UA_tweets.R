@@ -12,7 +12,7 @@ access_token_secret <- "137YdPfO9xmhjPDZyjIvYKtA5DgOkf1z6LhPQxQD1jy8H"
 setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
 
 #UAtweets <-c(searchTwitter('@unitedairlines',n=2000,since='2016-03-24'),searchTwitter('@united',n=2000,since='2016-03-24'),searchTwitter('united airlines',n=2000,since='2016-03-24'))
-UAtweets <-c(searchTwitter('@unitedairlines',n=1000,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=2000,since=as.character(Sys.Date() - 1)))
+UAtweets <-c(searchTwitter('@unitedairlines',n=50,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=50,since=as.character(Sys.Date() - 1)))
 
 #UAtweets.cln = laply(UAtweets, function(t) t$getText() )   #one-dimensional array = vector
 
@@ -87,4 +87,17 @@ neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'Un
   
   result <- score.sentiment(UAtweets.cln, pos.words, neg.words)
   result
-  
+
+is.data.frame(result)
+colnames(result)  
+
+resultCorpus <- Corpus(VectorSource(result$text))
+resultCorpus <- tm_map(resultCorpus, PlainTextDocument)  #converts to list
+is.list(resultCorpus)
+
+resultCorpus <- tm_map(resultCorpus, removePunctuation)
+resultCorpus <- tm_map(resultCorpus, removeWords, stopwords('english'))
+library(SnowballC)
+resultCorpus <- tm_map(resultCorpus, stemDocument)
+
+wordcloud(resultCorpus, max.words = 100, random.order = FALSE)
