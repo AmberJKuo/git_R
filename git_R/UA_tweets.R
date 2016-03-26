@@ -14,6 +14,7 @@ setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
 
 #UAtweets <-c(searchTwitter('@unitedairlines',n=2000,since='2016-03-24'),searchTwitter('@united',n=2000,since='2016-03-24'),searchTwitter('united airlines',n=2000,since='2016-03-24'))
 UAtweets <-c(searchTwitter('@unitedairlines',n=100,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=3000,since=as.character(Sys.Date() - 1)))
+#UAtweets <-searchTwitter('united airlines',n=2000,since='2016-03-24',until='2016-03-25')
 
 #UAtweets.cln = laply(UAtweets, function(t) t$getText() )   #one-dimensional array = vector
 
@@ -23,15 +24,18 @@ length(UAtweets.txt)
 #typeof(UAtweets.txt)
 #is.vector(UAtweets.txt)
 
+library(stringi)
+#all(stri_enc_isutf8(UAtweets.txt))   #are vectors encoded as utf-8?
+UAtweets.txt <- stri_encode(UAtweets.txt, "", "UTF-8")   #encode everything as UTF-8
+
 UAtweets.cln <- UAtweets.txt[!duplicated( UAtweets.txt )]   #this does the same: UAtweets.cln <- unique(UAtweets.txt)
 length(UAtweets.cln)
+#is.vector(UAtweets.cln)
 
 #UAtweets.cln=str_replace_all(UAtweets.cln,"(^[:graph:])", "x")   #remove non graphical characters in vector with regex. THIS DOESN'T WORK CORRECTLY...don't know why
 
-hu.liu.pos = scan('C:/Users/u298739/Downloads/positive-words.txt',
-                  what='character', comment.char=';')
-hu.liu.neg = scan('C:/Users/u298739/Downloads/negative-words.txt',
-                  what='character', comment.char=';')
+hu.liu.pos = scan('C:/Users/u298739/Downloads/positive-words.txt',what='character', comment.char=';')
+hu.liu.neg = scan('C:/Users/u298739/Downloads/negative-words.txt',what='character', comment.char=';')
 
 pos.words = c(hu.liu.pos, 'stroopwafel', 'waffle')
 neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'UnitedFail', 'late', 'stuck', 'unitedisadump', 'unitedidiots', 'custservfail', 'overbook', 'oversell')
@@ -88,15 +92,24 @@ neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'Un
 result <- score.sentiment(UAtweets.cln, pos.words, neg.words)
 result
 
+write.csv(result, file = "C:/Users/u298739/Documents/R/UAtweets")
+
 is.data.frame(result)
 colnames(result)  
 
+#all(stri_enc_isutf8(UAtweets.txt))  
+
 resultCorpus <- Corpus(VectorSource(result$text))
-resultCorpus <- tm_map(resultCorpus, PlainTextDocument)  #converts to list
-is.list(resultCorpus)
+resultCorpus <- tm_map(resultCorpus, PlainTextDocument)  #converts to TextDocument
 
 resultCorpus <- tm_map(resultCorpus, removePunctuation)
-resultCorpus <- tm_map(resultCorpus, removeWords, c(stopwords('english'),'united','flight','unitedairlines','unitedairlin','unite'))
-resultCorpus <- tm_map(resultCorpus, stemDocument)
 
-wordcloud(resultCorpus, max.words = 200, random.order = FALSE)
+resultCorpus <- tm_map(resultCorpus, tolower)
+result_stop <- tm_map(resultCorpus, removeWords, c(stopwords('english'),'unite', 'airlin','united','flight','unitedairlines','unitedairlin','airlines'))
+resultcloud <- tm_map(result_stop, stemDocument)
+resultcloud <- tm_map(resultcloud, PlainTextDocument)  #converts to TextDocument
+wordcloud(resultcloud, max.words = 200, random.order = FALSE, colors='Blue')
+
+#library(RColorBrewer) 
+#wordcloud(resultCorpus, max.words = 200, random.order = FALSE, colors=brewer.pal(9,'Blues'))
+
