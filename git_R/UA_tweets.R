@@ -4,6 +4,7 @@ library(stringr)
 library(wordcloud)
 library(tm)
 library(dplyr)
+library(SnowballC)  #word cloud
 
 api_key <- "PqJTcQPYNI6YdAqucQxdFxNxp"
 api_secret <- "H4Be2PSidOdJwE7KZJjBOc8R5hUd9gCnFdeTeLxScnanJdSclu"
@@ -12,7 +13,7 @@ access_token_secret <- "137YdPfO9xmhjPDZyjIvYKtA5DgOkf1z6LhPQxQD1jy8H"
 setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
 
 #UAtweets <-c(searchTwitter('@unitedairlines',n=2000,since='2016-03-24'),searchTwitter('@united',n=2000,since='2016-03-24'),searchTwitter('united airlines',n=2000,since='2016-03-24'))
-UAtweets <-c(searchTwitter('@unitedairlines',n=50,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=50,since=as.character(Sys.Date() - 1)))
+UAtweets <-c(searchTwitter('@unitedairlines',n=100,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=3000,since=as.character(Sys.Date() - 1)))
 
 #UAtweets.cln = laply(UAtweets, function(t) t$getText() )   #one-dimensional array = vector
 
@@ -81,12 +82,11 @@ neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'Un
   
   
   
-  sanityck <- c("You're awesome!", "I hate you!", "flights are delayed again", "stroopwafel")
-  result_ck <-score.sentiment(sanityck, pos.words, neg.words)
+#sanityck <- c("You're awesome!", "I hate you!", "flights are delayed again", "stroopwafel")
+#result_ck <-score.sentiment(sanityck, pos.words, neg.words)
   
-  
-  result <- score.sentiment(UAtweets.cln, pos.words, neg.words)
-  result
+result <- score.sentiment(UAtweets.cln, pos.words, neg.words)
+result
 
 is.data.frame(result)
 colnames(result)  
@@ -96,8 +96,7 @@ resultCorpus <- tm_map(resultCorpus, PlainTextDocument)  #converts to list
 is.list(resultCorpus)
 
 resultCorpus <- tm_map(resultCorpus, removePunctuation)
-resultCorpus <- tm_map(resultCorpus, removeWords, stopwords('english'))
-library(SnowballC)
+resultCorpus <- tm_map(resultCorpus, removeWords, c(stopwords('english'),'united','flight','unitedairlines','unitedairlin','unite'))
 resultCorpus <- tm_map(resultCorpus, stemDocument)
 
-wordcloud(resultCorpus, max.words = 100, random.order = FALSE)
+wordcloud(resultCorpus, max.words = 200, random.order = FALSE)
