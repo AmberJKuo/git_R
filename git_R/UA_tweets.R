@@ -13,7 +13,7 @@ access_token_secret <- "137YdPfO9xmhjPDZyjIvYKtA5DgOkf1z6LhPQxQD1jy8H"
 setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
 
 #UAtweets <-c(searchTwitter('@unitedairlines',n=2000,since='2016-03-24'),searchTwitter('@united',n=2000,since='2016-03-24'),searchTwitter('united airlines',n=2000,since='2016-03-24'))
-UAtweets <-c(searchTwitter('@unitedairlines',n=100,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=3000,since=as.character(Sys.Date() - 1)))
+UAtweets <-c(searchTwitter('@unitedairlines',n=1000,since=as.character(Sys.Date() - 1)),searchTwitter('@united',n=3000,since=as.character(Sys.Date() - 1)))
 #UAtweets <-searchTwitter('united airlines',n=2000,since='2016-03-24',until='2016-03-25')
 
 #UAtweets.cln = laply(UAtweets, function(t) t$getText() )   #one-dimensional array = vector
@@ -38,7 +38,7 @@ hu.liu.pos = scan('C:/Users/u298739/Downloads/positive-words.txt',what='characte
 hu.liu.neg = scan('C:/Users/u298739/Downloads/negative-words.txt',what='character', comment.char=';')
 
 pos.words = c(hu.liu.pos, 'stroopwafel', 'waffle')
-neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'UnitedFail', 'late', 'stuck', 'unitedisadump', 'unitedidiots', 'custservfail', 'overbook', 'oversell')
+neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'UnitedFail', 'late', 'stuck', 'unitedisadump', 'unitedidiots', 'missed', 'miss', 'overbook', 'oversell', 'overbooked', 'oversold')
 
 
   
@@ -91,8 +91,10 @@ neg.words = c(hu.liu.neg, 'wtf', 'wait', 'waiting','epicfail', 'mechanical', 'Un
   
 result <- score.sentiment(UAtweets.cln, pos.words, neg.words)
 result
+head(result)
 
-write.csv(result, file = "C:/Users/u298739/Documents/R/UAtweets")
+#write.table(result, "C:/Users/u298739/Documents/R/TWT_unitedairlines.txt", sep="\t", row.names = F) 
+write.table(result, "C:/Users/u298739/Documents/R/TWT_@united.txt", sep="\t", row.names = F) 
 
 is.data.frame(result)
 colnames(result)  
@@ -105,7 +107,7 @@ resultCorpus <- tm_map(resultCorpus, PlainTextDocument)  #converts to TextDocume
 resultCorpus <- tm_map(resultCorpus, removePunctuation)
 
 resultCorpus <- tm_map(resultCorpus, tolower)
-result_stop <- tm_map(resultCorpus, removeWords, c(stopwords('english'),'unite', 'airlin','united','flight','unitedairlines','unitedairlin','airlines'))
+result_stop <- tm_map(resultCorpus, removeWords, c(stopwords('english'),'unite', 'airlin','united','flight','unitedairlines','unitedairlin','airlines','airline'))
 resultcloud <- tm_map(result_stop, stemDocument)
 resultcloud <- tm_map(resultcloud, PlainTextDocument)  #converts to TextDocument
 wordcloud(resultcloud, max.words = 200, random.order = FALSE, colors='Blue')
